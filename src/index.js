@@ -3,7 +3,6 @@ const _ = require('lodash')
 const { match } = require('moleculer').Utils
 const { ServiceNotFoundError } = require("moleculer").Errors;
 const { BadRequestError } = require('./errors')
-const chalk = require('chalk')
 
 module.exports = {
   name: 'io',
@@ -325,7 +324,7 @@ function makeAuthorizeMiddleware(svc, handlerItem){
 function makeHandler(svc, handlerItem){
   svc.logger.debug('makeHandler:', handlerItem)
   return async function(action, params, respond){
-    svc.logger.info(`   => Client '${this.id}' call '${action}'`);
+    svc.logger.debug(`   => Client '${this.id}' call '${action}'`);
     if (svc.settings.logRequestParams && svc.settings.logRequestParams in svc.logger)
         svc.logger[svc.settings.logRequestParams]("   Params:", params);
     try{
@@ -334,7 +333,7 @@ function makeHandler(svc, handlerItem){
         params = null
       }
       let res = await svc.actions.call({socket:this, action, params, handlerItem})
-      svc.logger.info(`   <= ${chalk.green.bold('Success')} ${action}`)
+      svc.logger.debug(`   <= ${action}`)
       if(_.isFunction(respond)) respond(null, res)
     }catch(err){
       if (svc.settings.log4XXResponses || (err && !_.inRange(err.code, 400, 500))) {
